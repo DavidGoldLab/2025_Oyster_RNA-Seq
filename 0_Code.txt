@@ -51,9 +51,10 @@ for i in ../0_Data/*.fastq ; do \
  k=13 ktrim=r useshortkmers=t mink=5 qtrim=r trimq=10 minlength=20;\
 done
 
-# use fastqc to check the cleaned data
+# use FastQC (v.0.11.9) to check the cleaned data
+module load fastqc # v.0.11.9
 for i in *clean.fastq ; do \
- /home/dgold/Programs/FastQC/fastqc --outdir qualitycheck --format fastq \
+ fastqc --outdir qualitycheck --format fastq \
  --threads 16 $i;\
 done
 
