@@ -1,0 +1,87 @@
+## Analyses performed on UC Davis Peloton Cluster ##
+
+################
+# Download data
+################
+
+cd /home/dgold/24_Oysters/0_Data
+
+# Download Data with NCBI sratoolkit (v.2.10.5)
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846133 # "Control oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846134 # "Control oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846135 # "Control oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846137 # "Control oysters 38 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846140 # "Low pH exposed oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846141 # "Low pH exposed oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846142 # "Low pH exposed oysters 51 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846143 # "Low pH exposed oysters 38 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846144 # "Low pH exposed oysters 38 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846145 # "Low pH exposed oysters 38 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846148 # "Control oysters 38 days post-fertilization"
+~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846149 # "Control oysters 38 days post-fertilization"
+
+# Download "roslin_v1" genome with NCBI datasets (v.16.4.8)
+~/Programs/datasets download genome accession GCF_902806645.1 --include gff3,genome
+unzip ncbi_dataset.zip
+mv ./ncbi_dataset/data/GCF_902806645.1/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna ./
+mv ./ncbi_dataset/data/GCF_902806645.1/genomic.gff ./
+rm ncbi_dataset.zip
+rm -r ncbi_dataset
+rm README.md
+
+################################################
+# Clean data with BBDuk.sh in BBTools (v.39.01)
+################################################
+
+module load bbmap # v.39.01
+
+# Create "polyA.fa" file
+echo ">polyA
+AAAAAAAAAAAAAAAAAA" > polyA.fa
+
+# Get "truseq_rna.fa.gz" dataset
+wget https://github.com/ben-laufer/Tag-seq/raw/fab6d6afd181dad5dfd08bb5e641c2ed1ca26802/data/truseq_rna.fa.gz
+
+for i in ../0_Data/*.fastq ; do \
+ j=${i%_UMI*}
+ k=${j#"${j%/*}/"}
+ bbduk.sh \
+ in=$i out=$k.trimmed_clean.fastq \
+ ref=polyA.fa,truseq_rna.fa.gz \
+ k=13 ktrim=r useshortkmers=t mink=5 qtrim=r trimq=10 minlength=20;\
+done
+
+# use fastqc to check the cleaned data
+for i in *clean.fastq ; do \
+ /home/dgold/Programs/FastQC/fastqc --outdir qualitycheck --format fastq \
+ --threads 16 $i;\
+done
+
+################################
+# Map reads to genome with STAR
+################################
+
+cd /home/dgold/24_Oysters/1_Mapping
+
+module load star # v.2.7.6a
+
+# Make STAR genome index
+STAR --runThreadN 6 \
+--runMode genomeGenerate \
+--genomeDir ./genome \
+--genomeFastaFiles ../0_Data/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna \
+--sjdbGTFfile ../0_Data/genomic.gff \
+--sjdbOverhang 99
+
+# Map reads to genome
+for i in ../1_Clean_Data/*.fastq ; do \
+ j=${i#../1_Clean_Data/}
+ k=${j%.trimmed_clean.fastq}
+ ~/Programs/STAR-2.7.5a/bin/Linux_x86_64/STAR \
+ --runThreadN 16 --genomeDir ../2_Star_Ref --readFilesIn ./$i \
+ --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 \
+ --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.1 --alignIntronMin 20 \
+ --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD \
+ --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $k ;\
+done
+
