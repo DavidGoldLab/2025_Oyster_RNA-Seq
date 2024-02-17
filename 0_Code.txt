@@ -34,6 +34,7 @@ rm README.md
 ################################################
 
 module load bbmap # v.39.01
+module load openjdk # v.16.0.2
 
 # Create "polyA.fa" file
 echo ">polyA
@@ -42,21 +43,20 @@ AAAAAAAAAAAAAAAAAA" > polyA.fa
 # Get "truseq_rna.fa.gz" dataset
 wget https://github.com/ben-laufer/Tag-seq/raw/fab6d6afd181dad5dfd08bb5e641c2ed1ca26802/data/truseq_rna.fa.gz
 
-for i in ../0_Data/*.fastq ; do \
- j=${i%_UMI*}
- k=${j#"${j%/*}/"}
- bbduk.sh \
- in=$i out=$k.trimmed_clean.fastq \
- ref=polyA.fa,truseq_rna.fa.gz \
+for i in *.fastq ; do \
+ bbduk.sh in=$i out=${i%.fastq}.clean.fq ref=polyA.fa,truseq_rna.fa.gz \
  k=13 ktrim=r useshortkmers=t mink=5 qtrim=r trimq=10 minlength=20;\
 done
 
 # use FastQC (v.0.11.9) to check the cleaned data
 module load fastqc # v.0.11.9
-for i in *clean.fastq ; do \
+mkdir qualitycheck
+for i in *clean.fq ; do \
  fastqc --outdir qualitycheck --format fastq \
  --threads 16 $i;\
 done
+
+rm *fastq
 
 ################################
 # Map reads to genome with STAR
@@ -74,15 +74,12 @@ STAR --runThreadN 6 \
 --sjdbGTFfile ../0_Data/genomic.gff \
 --sjdbOverhang 99
 
-# Map reads to genome
-for i in ../1_Clean_Data/*.fastq ; do \
- j=${i#../1_Clean_Data/}
- k=${j%.trimmed_clean.fastq}
- ~/Programs/STAR-2.7.5a/bin/Linux_x86_64/STAR \
- --runThreadN 16 --genomeDir ../2_Star_Ref --readFilesIn ./$i \
- --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 \
- --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.1 --alignIntronMin 20 \
- --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD \
- --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $k ;\
+# Map reads to genome with STAR
+for filepath in ../0_Data/*.fq; do
+  filename=$(basename "$filepath")
+  STAR --runThreadN 16 --genomeDir ./genome --readFilesIn ./$i \
+  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 \
+  --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.1 --alignIntronMin 20 \
+  --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD \
+  --outSAMtype BAM SortedByCoordinate --outFileNamePrefix ${filename%.clean.fq} ;\
 done
-
