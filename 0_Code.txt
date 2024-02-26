@@ -98,23 +98,54 @@ for i in ../1_Mapping/*Aligned.sortedByCoord.out.bam; do \
  cufflinks --library-type fr-firststrand $i -p 16 -o ./${filename%Aligned.sortedByCoord.out.bam} ; \
 done
 
+##############################################
+# Merge transcript assemblies with gffcompare
+##############################################
+
+# Cuffmerge deprecated, use gffcompare instead
+
+# make file "input_gtf_list.txt"
+echo "./SRR15846133/transcripts.gtf
+./SRR15846134/transcripts.gtf
+./SRR15846135/transcripts.gtf
+./SRR15846137/transcripts.gtf
+./SRR15846140/transcripts.gtf
+./SRR15846141/transcripts.gtf
+./SRR15846142/transcripts.gtf
+./SRR15846143/transcripts.gtf
+./SRR15846144/transcripts.gtf
+./SRR15846145/transcripts.gtf
+./SRR15846148/transcripts.gtf
+./SRR15846149/transcripts.gtf" > input_gtf_list.txt
+
+# run gffcompare
+module load gffcompare # v.0.12.6
+
+gffcompare -r ../0_Data/genomic.gff \
+-i input_gtf_list.txt \
+-o Oyster_Final_Gene_Annotations
+
+################################################
+# Recount transcripts with merged transcriptome
+################################################
+
+for i in ../1_Mapping/*bam; do \
+ filename=$(basename "$i")
+ cuffquant \
+ Oyster_Final_Gene_Annotations.combined.gtf \
+ --library-type fr-firststrand \
+ -o CuffQuant_${filename%Aligned.sortedByCoord.out.bam} -p 16 $i ;
+done
+
+
+
 ######################
 ######################
 #### FOR LATER #######
 ######################
 ######################
 
-#############################################
-# Merge transcript assemblies with Cuffmerge
-#############################################
 
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/806/645/GCF_902806645.1_cgigas_uk_roslin_v1/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.gff.gz
-gzip -d GCF_902806645.1_cgigas_uk_roslin_v1_genomic.gff.gz
-
-cuffmerge -g GCF_902806645.1_cgigas_uk_roslin_v1_genomic.gff assembly_GTF_list.txt
-
-# Cleanup 
-rm GCF_902806645.1_cgigas_uk_roslin_v1_genomic.gff
 
 ################################################
 # Recount transcripts with merged transcriptome
