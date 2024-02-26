@@ -137,6 +137,52 @@ for i in ../1_Mapping/*bam; do \
  -o CuffQuant_${filename%Aligned.sortedByCoord.out.bam} -p 16 $i ;
 done
 
+# Extract CBX files from subfolders and append sample names 
+for i in */abundances.cxb; do\
+ j=${i%/abundances.cxb}
+ k=${j#CuffQuant_}
+ cp $i $k.cbx ;
+done
+
+# Rename cxb files based on descriptions
+
+mv SRR15846133.cbx C_51-1.cbx
+mv SRR15846134.cbx C_51-2.cbx
+mv SRR15846135.cbx C_51-3.cbx
+mv SRR15846137.cbx C_38-1.cbx
+mv SRR15846140.cbx E_51-1.cbx
+mv SRR15846141.cbx E_51-2.cbx
+mv SRR15846142.cbx E_51-3.cbx
+mv SRR15846143.cbx E_38-1.cbx
+mv SRR15846144.cbx E_38-2.cbx
+mv SRR15846145.cbx E_38-3.cbx
+mv SRR15846148.cbx C_38-2.cbx
+mv SRR15846149.cbx C_38-3.cbx
+
+
+#####################################
+# Create count tables with Cuffnorm 
+#####################################
+
+cuffnorm Oyster_Final_Gene_Annotations.combined.gtf \
+C_38-1.cbx,C_38-2.cbx,C_38-3.cbx \
+C_51-1.cbx,C_51-2.cbx,C_51-3.cbx \
+E_38-1.cbx,E_38-2.cbx,E_38-3.cbx \
+E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
+-L E_38,E_51,C_38,C_51 \
+-o cuffnorm --library-type fr-firststrand
+
+########################################################
+########################################################
+# 4. Annotation of revised transcriptome with Trinotate
+########################################################
+########################################################
+
+mkdir 3_Trinotate
+cd 3_Trinotate
+
+# generate transcripts fasta file using gffread
+module load gffread #v
 
 
 ######################
@@ -146,52 +192,6 @@ done
 ######################
 
 
-
-################################################
-# Recount transcripts with merged transcriptome
-################################################
-
-for i in ../2_Star_Mapping/*bam; do \
- j=${i%Aligned.*}
- k=${j#../2_Star_Mapping/}
- ~/Programs/cufflinks-2.2.1.Linux_x86_64/cuffquant \
- ./merged_asm/merged.gtf --library-type fr-firststrand \
- -o CuffQuant_$k -p 16 $i ;
-done
-
-# Extract CBX files from subfolders and append sample names 
-for i in */abundances.cxb; do\
- j=${i%/abundances.cxb}
- k=${j#CuffQuant_}
- mv $i $k.cbx ;
-done
-
-rm -r CuffQuant*
-
-#####################################
-# Create result tables with Cuffnorm 
-#####################################
-
-cuffnorm ./merged_asm/merged.gtf \
-L_A.cbx,L_B.cbx,L_C.cbx \
-C2_A.cbx,C2_B.cbx,C2_C.cbx \
-C3_A.cbx,C3_B.cbx,C3_C.cbx \
-OA2_A.cbx,OA2_B.cbx,OA2_C.cbx \
-OA3_A.cbx,OA3_B.cbx,OA3_C.cbx \
-SM1_A.cbx,SM1_B.cbx,SM1_C.cbx \
-SM3_A.cbx,SM3_B.cbx,SM3_C.cbx \
--L L,C-2-38D,C-3-51D,OA-2-38D,OA-3-51D,SM-1-38D,SM-3-51D \
--o cuffnorm --library-type fr-firststrand
-
-# cleanup
-
-mkdir ../0_Results
-
-cp ./cuffnorm/genes.count_table ../0_Results/Oyster_Cufflinks.genes.count_table
-cp ./cuffnorm/genes.fpkm_table ../0_Results/Oyster_Cufflinks.genes.fpkm_table
-cp ../merged_asm/merged.gtf ../0_Results/Oyster_Gene_Models.gtf
-
-# manually renamed samples to reflect original names (e.g. L-A) and not cufflink IDs (e.g. L_0)
 
 ########################################################
 ########################################################
