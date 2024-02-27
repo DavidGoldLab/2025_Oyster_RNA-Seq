@@ -159,7 +159,6 @@ mv SRR15846145.cbx E_38-3.cbx
 mv SRR15846148.cbx C_38-2.cbx
 mv SRR15846149.cbx C_38-3.cbx
 
-
 #####################################
 # Create count tables with Cuffnorm 
 #####################################
@@ -171,6 +170,25 @@ E_38-1.cbx,E_38-2.cbx,E_38-3.cbx \
 E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
 -L E_38,E_51,C_38,C_51 \
 -o cuffnorm --library-type fr-firststrand
+
+###################################################
+# Calculate differential expression with Cuffdiff
+###################################################
+
+cuffdiff Oyster_Final_Gene_Annotations.combined.gtf \
+C_38-1.cbx,C_38-2.cbx,C_38-3.cbx \
+C_51-1.cbx,C_51-2.cbx,C_51-3.cbx \
+E_38-1.cbx,E_38-2.cbx,E_38-3.cbx \
+E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
+-L E_38,E_51,C_38,C_51 \
+-o cuffdiff -p 16 --library-type fr-firststrand
+
+######################
+######################
+#### FOR LATER #######
+######################
+######################
+
 
 ########################################################
 ########################################################
@@ -185,11 +203,7 @@ cd 3_Trinotate
 module load gffread #v
 
 
-######################
-######################
-#### FOR LATER #######
-######################
-######################
+
 
 
 
