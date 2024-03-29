@@ -212,14 +212,20 @@ C_51	C_51_2" > samples.txt
 
 
 /usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
---matrix .cuffnorm/2_Cufflinks/cuffnorm \
+--matrix .cuffnorm/2_Cufflinks/cuffnorm/genes.DE.count_table \
 --heatmap_colorscheme 'blue,black,yellow' \
 -s samples.txt --min_rowSums 10 --log2 \
 --CPM --center_rows \
 --prin_comp 3 --sample_cor_matrix
 
+# Manually created additional file, called "genes.DE.count_table", using "genes.DE.count_table" and "significant" information from "gene_exp.diff" file
 
-
+/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
+--matrix genes.DE.count_table \
+--heatmap_colorscheme 'blue,black,yellow' \
+-s samples.txt --min_rowSums 10 --log2 \
+--CPM --center_rows \
+--prin_comp 3 --sample_cor_matrix
 
 
 
