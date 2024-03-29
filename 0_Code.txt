@@ -183,6 +183,54 @@ E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
 -L E_38,E_51,C_38,C_51 \
 -o cuffdiff -p 16 --library-type fr-firststrand
 
+####################################################
+# 5. Generate PCA and correlation matrices with PtR
+####################################################
+
+# Had to update PtR file "heatmap.3.R" for compatability with R v4.2
+	# https://github.com/trinityrnaseq/trinityrnaseq/issues/1337
+		# -    if (is.null(Rowv) || is.na(Rowv))
+		# +    if (all(is.null(Rowv)) || all(is.na(Rowv)))
+		# -    if (is.null(Colv) || is.na(Colv))
+		# +    if (all(is.null(Colv)) || all(is.na(Colv)))
+		# -    else if (Colv == "Rowv" && !isTRUE(Rowv))
+		# +    else if (all(Colv == "Rowv") && !all(isTRUE(Rowv)))
+
+# Create "samples.txt" file
+echo "E_38	E_38_0
+E_38	E_38_1
+E_38	E_38_2
+E_51	E_51_0
+E_51	E_51_1
+E_51	E_51_2
+C_38	C_38_0
+C_38	C_38_1
+C_38	C_38_2
+C_51	C_51_0
+C_51	C_51_1
+C_51	C_51_2" > samples.txt
+
+
+/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
+--matrix .cuffnorm/2_Cufflinks/cuffnorm \
+--heatmap_colorscheme 'blue,black,yellow' \
+-s samples.txt --min_rowSums 10 --log2 \
+--CPM --center_rows \
+--prin_comp 3 --sample_cor_matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ######################
 ######################
 #### FOR LATER #######
