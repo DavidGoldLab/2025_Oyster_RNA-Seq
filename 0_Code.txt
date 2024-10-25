@@ -187,6 +187,8 @@ E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
 # 5. Generate PCA and correlation matrices with PtR
 ####################################################
 
+cd ../3_DE_Analysis
+
 # Had to update PtR file "heatmap.3.R" for compatability with R v4.2
 	# https://github.com/trinityrnaseq/trinityrnaseq/issues/1337
 		# -    if (is.null(Rowv) || is.na(Rowv))
@@ -212,7 +214,7 @@ C_51	C_51_2" > samples.txt
 
 
 /usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
---matrix .cuffnorm/2_Cufflinks/cuffnorm/genes.DE.count_table \
+--matrix ../2_Cufflinks/cuffnorm/genes.DE.count_table \
 --heatmap_colorscheme 'blue,black,yellow' \
 -s samples.txt --min_rowSums 10 --log2 \
 --CPM --center_rows \
@@ -259,7 +261,11 @@ rm cuffdiff/tss_group*
 gzip Oyster_Final_Gene_Annotations.combined.gtf
 gzip Oyster_Final_Gene_Annotations.loci
 
-cd ../3_SMPs
+cd ../3_DE_Analysis
+gzip gene_exp.diff
+gzip genes.count_table.minRow10.CPM.log2.centered.PCA.prcomp.loadings
+gzip genes.count_table.minRow10.CPM.log2.centered.dat
+gzip genes.count_table
 
 
 
