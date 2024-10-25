@@ -230,10 +230,36 @@ C_51	C_51_2" > samples.txt
 
 
 
+#########
+# Cleanup
+#########
 
+# Remove large intermediate files
+cd 0_Data
+rm *fq
+rm GCA_963853765.1_xbMagGiga1.1_genomic.fna
+rm GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna
+rm GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna.fai 
+rm genomic.gff
 
+cd ../1_Mapping
+rm *bam
+rm -r genome
+rm -r *STARtmp
+gzip *tab
 
+cd ../2_Cufflinks
+rm *cbx
+rm -r CuffQuant*
+rm Oyster_Final_Gene_Annotations.tracking
+gzip SRR*/*
+gzip cuff*/*
+rm cuffdiff/isoform*
+rm cuffdiff/tss_group*
+gzip Oyster_Final_Gene_Annotations.combined.gtf
+gzip Oyster_Final_Gene_Annotations.loci
 
+cd ../3_SMPs
 
 
 
