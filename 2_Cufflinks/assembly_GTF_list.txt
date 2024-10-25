@@ -1,0 +1,12 @@
+SRR15846133/transcripts.gtf
+SRR15846134/transcripts.gtf
+SRR15846135/transcripts.gtf
+SRR15846137/transcripts.gtf
+SRR15846140/transcripts.gtf
+SRR15846141/transcripts.gtf
+SRR15846142/transcripts.gtf
+SRR15846143/transcripts.gtf
+SRR15846144/transcripts.gtf
+SRR15846145/transcripts.gtf
+SRR15846148/transcripts.gtf
+SRR15846149/transcripts.gtf
