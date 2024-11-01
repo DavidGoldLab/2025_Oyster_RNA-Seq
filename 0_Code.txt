@@ -1,12 +1,34 @@
 ## Analyses performed on UC Davis Peloton Cluster ##
 
-################
-# Download data
-################
+#############################
+#############################
+# 1. Download and clean data
+#############################
+#############################
 
-cd /home/dgold/24_Oysters/0_Data
+cd /0_Data
 
+#############################################################
+# Download xbMagGiga1.1 genome with NCBI datasets (v.16.4.8)
+#############################################################
+
+# Download NCBI Datasets and make it executable
+curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets'
+chmod +x datasets
+
+# download genome
+./datasets download genome accession GCF_963853765.1 --include gff3,rna,cds,protein,genome,seq-report
+unzip ncbi_dataset.zip
+mv ./ncbi_dataset/data/GCF_963853765.1/GCF_963853765.1_xbMagGiga1.1_genomic.fna ../
+mv ./ncbi_dataset/data/GCF_963853765.1/genomic.gff  ../
+rm -r *
+mv ../GCF_963853765.1_xbMagGiga1.1_genomic.fna ./
+mv ../genomic.gff  ./
+
+###############################################
 # Download Data with NCBI sratoolkit (v.2.10.5)
+###############################################
+
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846133 # "Control oysters 51 days post-fertilization"
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846134 # "Control oysters 51 days post-fertilization"
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846135 # "Control oysters 51 days post-fertilization"
@@ -19,15 +41,6 @@ cd /home/dgold/24_Oysters/0_Data
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846145 # "Low pH exposed oysters 38 days post-fertilization"
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846148 # "Control oysters 38 days post-fertilization"
 ~/Programs/sratoolkit.2.10.5-centos_linux64/bin/fasterq-dump -e 8 SRR15846149 # "Control oysters 38 days post-fertilization"
-
-# Download "roslin_v1" genome with NCBI datasets (v.16.4.8)
-~/Programs/datasets download genome accession GCF_902806645.1 --include gff3,genome
-unzip ncbi_dataset.zip
-mv ./ncbi_dataset/data/GCF_902806645.1/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna ./
-mv ./ncbi_dataset/data/GCF_902806645.1/genomic.gff ./
-rm ncbi_dataset.zip
-rm -r ncbi_dataset
-rm README.md
 
 ################################################
 # Clean data with BBDuk.sh in BBTools (v.39.01)
@@ -62,7 +75,7 @@ rm *fastq
 # Map reads to genome with STAR
 ################################
 
-cd /home/dgold/24_Oysters/1_Mapping
+cd ../1_Mapping
 
 module load star # v.2.7.6a
 
@@ -70,7 +83,7 @@ module load star # v.2.7.6a
 STAR --runThreadN 16 \
 --runMode genomeGenerate \
 --genomeDir ./genome \
---genomeFastaFiles ../0_Data/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna \
+--genomeFastaFiles ../0_Data/GCF_963853765.1_xbMagGiga1.1_genomic.fna \
 --sjdbGTFfile ../0_Data/genomic.gff \
 --sjdbOverhang 100
 
@@ -269,30 +282,6 @@ gzip genes.count_table
 
 
 
-######################
-######################
-#### FOR LATER #######
-######################
-######################
-
-
-########################################################
-########################################################
-# 4. Annotation of revised transcriptome with Trinotate
-########################################################
-########################################################
-
-mkdir 3_Trinotate
-cd 3_Trinotate
-
-# generate transcripts fasta file using gffread
-module load gffread #v
-
-
-
-
-
-
 ########################################################
 ########################################################
 # 4. Annotation of revised transcriptome with Trinotate
@@ -302,14 +291,21 @@ module load gffread #v
 mkdir 4_Trinotate
 cd 4_Trinotate
 
-# generate fasta file from Cuffmerge GFF
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/806/645/GCF_902806645.1_cgigas_uk_roslin_v1/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz
-gzip -d GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz
+## Get genome ##
+# Download Datasets and make it executable
+curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets'
+chmod +x datasets
+./datasets download genome accession GCA_902806645.1 --include genome
+unzip ncbi_dataset.zip
+mv ./ncbi_dataset/data/GCA_902806645.1/GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna ../
+rm -r *
+mv ../GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna ./
 
-gffread -g GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna -w Oyster_Cufflinks.Transcripts.fasta \
-../3_Cufflinks/merged_asm/merged.gtf
+## generate fasta file from Cuffmerge GFF ##
+module load gffread #v 0.12.7
+gffread -w transcripts.fa -g GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna \
+../2_Cufflinks/Oyster_Final_Gene_Annotations.combined.gtf
 
-rm GCF_902806645*
 
 #####################################
 # predict proteins with transdecoder
