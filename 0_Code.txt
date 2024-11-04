@@ -2,7 +2,7 @@
 
 #############################
 #############################
-# 1. Download and clean data
+# 0. Download and clean data
 #############################
 #############################
 
@@ -71,9 +71,11 @@ done
 
 rm *fastq
 
-################################
-# Map reads to genome with STAR
-################################
+###################################
+###################################
+# 1. Map reads to genome with STAR
+###################################
+###################################
 
 cd ../1_Mapping
 
@@ -90,19 +92,20 @@ STAR --runThreadN 16 \
 # Map reads to genome with STAR
 for i in ../0_Data/*.fq; do
   filename=$(basename "$i")
-  echo "STAR --runThreadN 16 --genomeDir ./genome --readFilesIn ./$i \
+  STAR --runThreadN 16 --genomeDir ./genome --readFilesIn ./$i \
   --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 \
   --outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.1 --alignIntronMin 20 \
   --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD \
-  --outSAMtype BAM SortedByCoordinate --outFileNamePrefix ${filename%.clean.fq}" ;\
+  --outSAMtype BAM SortedByCoordinate --outFileNamePrefix ${filename%.clean.fq} ;\
 done
 
-##################################################
-# Create new transcript assemblies with Cufflinks
-##################################################
+#####################################################
+#####################################################
+# 2. Create new transcript assemblies with Cufflinks
+#####################################################
+#####################################################
 
-mkdir 2_Cufflinks
-cd 2_Cufflinks
+cd ../2_Cufflinks
 
 module load cufflinks # v.2.2.1
 
@@ -195,6 +198,194 @@ E_38-1.cbx,E_38-2.cbx,E_38-3.cbx \
 E_51-1.cbx,E_51-2.cbx,E_51-3.cbx \
 -L E_38,E_51,C_38,C_51 \
 -o cuffdiff -p 16 --library-type fr-firststrand
+
+########################################################
+########################################################
+# 3. Annotation of revised transcriptome with Trinotate
+########################################################
+########################################################
+
+cd ../3_Trinotate
+
+# Requires SignalP - 6.0 (https://services.healthtech.dtu.dk/cgi-bin/sw_ship)
+# Requires tmhmm v2 (https://services.healthtech.dtu.dk/service.php?TMHMM-2.0)
+# Requires eggnog-mapper (https://github.com/eggnogdb/eggnog-mapper/releases/tag/2.1.12)
+PATH=$PATH:/home/dgold/.local/bin
+
+#####################
+# Prepare input data
+#####################
+
+## generate fasta file from Cuffmerge GFF ##
+module load gffread #v 0.12.7
+gffread -w Oyster_Cufflinks.Transcripts.fasta -g ../0_Data/GCF_963853765.1_xbMagGiga1.1_genomic.fna \
+../2_Cufflinks/Oyster_Final_Gene_Annotations.combined.gtf
+
+# predict proteins with transdecoder
+
+~/Programs/TransDecoder-TransDecoder-v5.5.0/TransDecoder.LongOrfs -t Oyster_Cufflinks.Transcripts.fasta
+~/Programs/TransDecoder-TransDecoder-v5.5.0/TransDecoder.Predict -t Oyster_Cufflinks.Transcripts.fasta
+
+# cleanup 
+mv Oyster_Cufflinks.Transcripts.fasta.transdecoder.pep Oyster_Cufflinks.Proteins.fasta
+mv Oyster_Cufflinks.Proteins.fasta ../
+mv Oyster_Cufflinks.Transcripts.fasta ../
+rm -r *
+mv ../Oyster_Cufflinks.Proteins.fasta ./
+mv ../Oyster_Cufflinks.Transcripts.fasta ./
+
+# Clean transdecoder output (remove extended ID names, remove stop codon amino acid -- causes problems with some programs)
+sed 's/\*//g' Oyster_Cufflinks.Proteins.fasta > Temp1
+sed -i 's/ .*$//' Temp1
+mv Temp1 Oyster_Cufflinks.Proteins.fasta
+
+# Generate genes to transcript map
+module load samtools # v.1.16.1
+~/Programs/Trinotate-v4.0.2/util/Trinotate_GTF_or_GFF3_annot_prep.pl \
+--annot ../2_Cufflinks/Oyster_Final_Gene_Annotations.combined.gtf \
+--genome_fa ../0_Data/GCF_963853765.1_xbMagGiga1.1_genomic.fna \
+--out_prefix Oyster_Trinotate
+
+# Cleanup
+rm Oyster_Trinotate.proteins.fa
+rm Oyster_Trinotate.transcripts.cdna.fa
+
+##########################################################
+# Initialize Trinotate database and run sequence analyses
+##########################################################
+
+module load infernal #1.1.4
+module load hmmer #3.3.2
+module load blast-plus # v.2.13.0
+module load diamond #v.2.0.15
+# Load signalp
+PATH=$PATH:/home/dgold/Programs/signalp-5.0b/bin
+# Load tmhmmv2
+PATH=$PATH:~/Programs/tmhmm-2.0c/bin
+PATH=$PATH:~/.local/bin
+
+# Activate eggNOG-mapper
+# Add conda to $PAHTH
+PATH=$PATH:~/miniconda3/bin
+# Create a Conda environment for eggnog-mapper
+conda create -n eggnog-mapper-env python=3.8
+# Activate the Conda environment:
+conda activate eggnog-mapper-env
+# Install eggNOG-mapper:
+conda install -c bioconda eggnog-mapper
+# Run eggNOG-mapper:
+emapper.py -i input_sequences.fasta -o output_annotations
+
+# Initialize Trinotate database
+~/Programs/Trinotate-v4.0.2/Trinotate --create \
+--db Oyster_Trinotate.sqlite \
+--trinotate_data_dir ./data_dir \
+--use_diamond
+
+# Populate with sequence data
+~/Programs/Trinotate-v4.0.2/Trinotate --db Oyster_Trinotate.sqlite --init \
+--gene_trans_map Oyster_Trinotate.gene-to-trans-map \
+--transcript_fasta Oyster_Cufflinks.Transcripts.fasta \
+--transdecoder_pep Oyster_Cufflinks.Proteins.fasta
+
+#  Run Sequence Analyses
+~/Programs/Trinotate-v4.0.2/Trinotate --db Oyster_Trinotate.sqlite  --CPU 16 \
+--transcript_fasta Oyster_Cufflinks.Transcripts.fasta \
+--transdecoder_pep Oyster_Cufflinks.Proteins.fasta \
+--trinotate_data_dir ./data_dir \
+--run "swissprot_blastp swissprot_blastx pfam infernal" \
+--use_diamond 
+
+# signalp6 tmhmmv2 EggnogMapper
+
+# Run tmhmmv2 separately
+cat Oyster_Cufflinks.Proteins.fasta  | decodeanhmm \
+-f /home/dgold/Programs/tmhmm-2.0c/lib/TMHMM2.0.options \
+-modelfile /home/dgold/Programs/tmhmm-2.0c/lib/TMHMM2.0.model \
+> tmhmm.v2.out
+# Load results
+~/Programs/Trinotate-v4.0.2/Trinotate \
+Oyster_Trinotate.sqlite LOAD_tmhmm tmhmm.v2.out
+
+# Run signalp separately
+PATH=$PATH:~/Programs/signalp6_fast/signalp-6-package
+
+signalp -f short -n signalp.out Trinity.fasta.transdecoder.pep
+# Load results
+~/Programs/Trinotate-v4.0.2/Trinotate \
+Oyster_Trinotate.sqlite LOAD_signalp signalp.out
+
+
+
+# Generate the Trinotate Report
+
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --report > Oyster_Trinotate.tsv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############################
+# perform BLAST comparisons
+############################
+
+
+blastp -query Oyster_transcripts.fasta.transdecoder.pep -db uniprot_sprot.pep \
+-num_threads 64 -max_target_seqs 1 -outfmt 6 -evalue 1e-3 > blastp.outfmt6
+
+blastx -query Oyster_transcripts.fasta -db uniprot_sprot.pep \
+-num_threads 32 -max_target_seqs 1 -outfmt 6 -evalue 1e-3 > blastx.outfmt6
+
+###########################################
+# identify signaling peptides with signalp
+###########################################
+
+~/Programs/signalp-4.1/signalp \
+-f short -n signalp.out  \
+Oyster_Cufflinks.Proteins.fasta
+
+###################
+# Load initial data
+###################
+
+# make "gene_trans_map" file manually from merged.gtf
+# because "gene_trans_map" was made manually it is the only intermediate file included in this folder; the rest can generated using the code provieded
+
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite init \
+--gene_trans_map  gene_trans_map.txt \
+--transcript_fasta Oyster_Cufflinks.Transcripts.fasta \
+--transdecoder_pep Oyster_Cufflinks.Proteins.fasta
+
+########################################
+# Add additional data and output report
+########################################
+
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite LOAD_swissprot_blastp blastp.outfmt6
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite LOAD_pfam TrinotatePFAM.out
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite LOAD_swissprot_blastx blastx.outfmt6
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite LOAD_signalp signalp.out
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite LOAD_rnammer Oyster_Cufflinks.Transcripts.fasta.rnammer.gff
+~/Programs/Trinotate-Trinotate-v3.2.1/Trinotate Trinotate_Oyster.sqlite report > Oyster_Trinotate.report.txt
+
+# cleanup
+
+mv Oyster_Cufflinks.Proteins.fasta ../0_Results
+mv Oyster_Cufflinks.Transcripts.fasta ../0_Results
+mv Oyster_Trinotate.report.txt ../0_Results
+mv gene_trans_map.txt ../gene_trans_map.txt
+rm -r *
+mv ../gene_trans_map.txt ./
 
 ####################################################
 # 5. Generate PCA and correlation matrices with PtR

@@ -2,6 +2,6 @@
 #gffcompare -r ../0_Data/genomic.gff -i input_gtf_list.txt -o Oyster_Final_Gene_Annotations
 #
 
- Total union super-loci across all input datasets: 40764 
-  (8786 multi-transcript, ~3.4 transcripts per locus)
-138467 out of 138467 consensus transcripts written in Oyster_Final_Gene_Annotations.combined.gtf (0 discarded as redundant)
+ Total union super-loci across all input datasets: 39656 
+  (8575 multi-transcript, ~3.4 transcripts per locus)
+136540 out of 136540 consensus transcripts written in Oyster_Final_Gene_Annotations.combined.gtf (0 discarded as redundant)

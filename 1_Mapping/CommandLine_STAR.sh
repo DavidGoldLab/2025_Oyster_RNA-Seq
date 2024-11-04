@@ -2,21 +2,13 @@
 #SBATCH -D /home/dgold/BLAST
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=dgold@ucdavis.edu 
-#SBATCH -o /home/dgold/STAR-o%j.txt
-#SBATCH -e /home/dgold/STAR-e%j.txt
-#SBATCH -J STAR
-#SBATCH -t 36:00:00 #60 minutes
+#SBATCH -o /home/dgold/EXAMPLE-o%j.txt
+#SBATCH -e /home/dgold/EXAMPLE-e%j.txt
+#SBATCH -J EXAMPLE
+#SBATCH -t 3:60:00 #60 minutes
 
-cd /home/dgold/24_Oysters/1_Mapping
-
+cd /home/dgold/25_Oysters/1_Mapping
 module load star
-
-STAR --runThreadN 16 \
---runMode genomeGenerate \
---genomeDir ./genome \
---genomeFastaFiles ../0_Data/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna \
---sjdbGTFfile ../0_Data/genomic.gff \
---sjdbOverhang 100
 
 for i in ../0_Data/*.fq; do
   filename=$(basename "$i")
