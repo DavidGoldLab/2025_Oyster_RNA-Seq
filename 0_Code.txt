@@ -234,10 +234,10 @@ rm -r *
 mv ../Oyster_Cufflinks.Proteins.fasta ./
 mv ../Oyster_Cufflinks.Transcripts.fasta ./
 
-# Clean transdecoder output (remove extended ID names, remove stop codon amino acid -- causes problems with some programs)
-sed 's/\*//g' Oyster_Cufflinks.Proteins.fasta > Temp1
-sed -i 's/ .*$//' Temp1
-mv Temp1 Oyster_Cufflinks.Proteins.fasta
+# # Clean transdecoder output (remove extended ID names, remove stop codon amino acid -- causes problems with some programs)
+# sed 's/\*//g' Oyster_Cufflinks.Proteins.fasta > Temp1
+# sed -i 's/ .*$//' Temp1
+# mv Temp1 Oyster_Cufflinks.Proteins.fasta
 
 # Generate genes to transcript map
 module load samtools # v.1.16.1
