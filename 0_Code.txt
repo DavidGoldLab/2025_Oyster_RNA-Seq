@@ -296,30 +296,56 @@ PATH=$PATH:~/.local/bin
 --run "swissprot_blastp swissprot_blastx pfam infernal" \
 --use_diamond 
 
-# signalp6 tmhmmv2 EggnogMapper
-
+#########################
 # Run tmhmmv2 separately
-cat Oyster_Cufflinks.Proteins.fasta  | decodeanhmm \
--f /home/dgold/Programs/tmhmm-2.0c/lib/TMHMM2.0.options \
--modelfile /home/dgold/Programs/tmhmm-2.0c/lib/TMHMM2.0.model \
-> tmhmm.v2.out
-# Load results
-~/Programs/Trinotate-v4.0.2/Trinotate \
-Oyster_Trinotate.sqlite LOAD_tmhmm tmhmm.v2.out
+#########################
 
+# Create protein file without '*' character (causes errors)
+sed 's/*//g' Oyster_Cufflinks.Proteins.fasta > Temp.Proteins.fasta
+
+# Install BioLib
+pip3 install pybiolib
+# Run DeepTMHMM
+biolib run DTU/DeepTMHMM --fasta Temp.Proteins.fasta
+
+
+# Cleanup
+rm Temp.Proteins.fasta
+
+#########################
 # Run signalp separately
-PATH=$PATH:~/Programs/signalp6_fast/signalp-6-package
+#########################
 
+PATH=$PATH:~/Programs/signalp6_fast/signalp-6-package
 signalp -f short -n signalp.out Trinity.fasta.transdecoder.pep
 # Load results
 ~/Programs/Trinotate-v4.0.2/Trinotate \
 Oyster_Trinotate.sqlite LOAD_signalp signalp.out
 
+####################################
+# Load results into sqlite database
+####################################
+
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --LOAD_swissprot_blastp uniprot_sprot.diamond.blastp.outfmt6
+
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --LOAD_pfam TrinotatePFAM.out
+
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --LOAD_swissprot_blastx uniprot_sprot.diamond.blastx.outfmt6
+
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --LOAD_infernal infernal.out
+             
+~/Programs/Trinotate-v4.0.2/Trinotate \
+--db Oyster_Trinotate.sqlite --LOAD_tmhmmv2 tmhmm.v2.out
+
 
 # Generate the Trinotate Report
 
 ~/Programs/Trinotate-v4.0.2/Trinotate \
---db Oyster_Trinotate.sqlite --report > Oyster_Trinotate.tsv
+--db Oyster_Trinotate.sqlite --report > Oyster_Trinotate_Report.tsv
 
 ##############
 ##############
