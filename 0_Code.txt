@@ -355,6 +355,52 @@ Oyster_Trinotate.sqlite LOAD_signalp signalp.out
 
 # Gene files (filename "1-.*") generated manually from ../2_Cufflinks/cuffdiff/gene_exp.diff
 
+###################################################
+# 5. Generate PCA and correlation matrices with PtR
+####################################################
+
+cd ../4_DE_Analyses/Heat_Maps
+
+# Had to update PtR file "heatmap.3.R" for compatability with R v4.2
+	# https://github.com/trinityrnaseq/trinityrnaseq/issues/1337
+		# -    if (is.null(Rowv) || is.na(Rowv))
+		# +    if (all(is.null(Rowv)) || all(is.na(Rowv)))
+		# -    if (is.null(Colv) || is.na(Colv))
+		# +    if (all(is.null(Colv)) || all(is.na(Colv)))
+		# -    else if (Colv == "Rowv" && !isTRUE(Rowv))
+		# +    else if (all(Colv == "Rowv") && !all(isTRUE(Rowv)))
+
+# Create "samples.txt" file
+echo -e "E_38\tE_38_0
+E_38\tE_38_1
+E_38\tE_38_2
+E_51\tE_51_0
+E_51\tE_51_1
+E_51\tE_51_2
+C_38\tC_38_0
+C_38\tC_38_1
+C_38\tC_38_2
+C_51\tC_51_0
+C_51\tC_51_1
+C_51\tC_51_2" > samples.txt
+
+# Manually created additional file, called "genes.DE.count_table", using "genes.DE.count_table" and "significant" information from "gene_exp.diff" file
+
+/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
+--matrix genes.DE.count_table.txt \
+--heatmap_colorscheme 'blue,black,yellow' \
+-s samples.txt --min_rowSums 10 --log2 \
+--CPM --center_rows \
+--prin_comp 3 --sample_cor_matrix
+
+# Manually created 
+
+/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
+--matrix carbonic_anhydrases.DE.count_table.txt \
+--heatmap_colorscheme 'blue,black,yellow' \
+-s samples.txt --min_rowSums 10 --log2 \
+--CPM --center_rows \
+--heatmap
 
 #########
 #########
