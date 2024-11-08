@@ -396,9 +396,8 @@ C_51\tC_51_2" > samples.txt
 # Manually created 
 
 /usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
---matrix carbonic_anhydrases.DE.count_table.txt \
---heatmap_colorscheme 'blue,black,yellow' \
--s samples.txt --min_rowSums 10 --log2 \
+--matrix carbonic_anhydrases.DE.count_table.averaged.txt \
+--heatmap_colorscheme 'blue,black,yellow' --min_rowSums 10 --log2 \
 --CPM --center_rows \
 --heatmap
 

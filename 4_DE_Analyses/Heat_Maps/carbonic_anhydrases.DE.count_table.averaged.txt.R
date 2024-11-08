@@ -6,12 +6,12 @@ options(stringsAsFactors = FALSE)
 NO_REUSE = F
 
 # try to reuse earlier-loaded data if possible
-if (file.exists("carbonic_anhydrases.DE.count_table.txt.RData") && ! NO_REUSE) {
+if (file.exists("carbonic_anhydrases.DE.count_table.averaged.txt.RData") && ! NO_REUSE) {
     print('RESTORING DATA FROM EARLIER ANALYSIS')
-    load("carbonic_anhydrases.DE.count_table.txt.RData")
+    load("carbonic_anhydrases.DE.count_table.averaged.txt.RData")
 } else {
     print('Reading matrix file.')
-    primary_data = read.table("carbonic_anhydrases.DE.count_table.txt", header=T, com='', row.names=1, check.names=F, sep='\t')
+    primary_data = read.table("carbonic_anhydrases.DE.count_table.averaged.txt", header=T, com='', row.names=1, check.names=F, sep='\t')
     primary_data = as.matrix(primary_data)
 }
 source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/heatmap.3.R")
@@ -20,19 +20,12 @@ source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression
 source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/vioplot2.R")
 data = primary_data
 myheatcol = colorpanel(75, 'blue','black','yellow')
-samples_data = read.table("samples.txt", header=F, check.names=F, fill=T)
-samples_data = samples_data[samples_data[,2] != '',]
-colnames(samples_data) = c('sample_name', 'replicate_name')
-sample_types = as.character(unique(samples_data[,1]))
-rep_names = as.character(samples_data[,2])
-data = data[, colnames(data) %in% rep_names, drop=F ]
+sample_types = colnames(data)
 nsamples = length(sample_types)
 sample_colors = rainbow(nsamples)
-names(sample_colors) = sample_types
 sample_type_list = list()
 for (i in 1:nsamples) {
-    samples_want = samples_data[samples_data[,1]==sample_types[i], 2]
-    sample_type_list[[sample_types[i]]] = as.vector(samples_want)
+    sample_type_list[[sample_types[i]]] = sample_types[i]
 }
 sample_factoring = colnames(data)
 for (i in 1:nsamples) {
@@ -64,7 +57,7 @@ data = as.matrix(data) # convert to matrix
 # Centering rows
 data = t(scale(t(data), scale=F))
 
-write.table(data, file="carbonic_anhydrases.DE.count_table.txt.minRow10.CPM.log2.centered.dat", quote=F, sep='	');
+write.table(data, file="carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered.dat", quote=F, sep='	');
 if (nrow(data) < 2) { stop("
 
 **** Sorry, at least two rows are required for this matrix.
@@ -82,7 +75,7 @@ gene_dist = dist(data, method='euclidean')
 if (nrow(data) <= 1) { message('Too few genes to generate heatmap'); quit(status=0); }
 hc_genes = hclust(gene_dist, method='complete')
 heatmap_data = data
-pdf("carbonic_anhydrases.DE.count_table.txt.minRow10.CPM.log2.centered.genes_vs_samples_heatmap.pdf")
+pdf("carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered.genes_vs_samples_heatmap.pdf")
 heatmap.3(heatmap_data, dendrogram='both', Rowv=as.dendrogram(hc_genes), Colv=as.dendrogram(hc_samples), col=myheatcol, scale="none", density.info="none", trace="none", key=TRUE, keysize=1.2, cexCol=1, margins=c(10,10), cex.main=0.75, main=paste("samples vs. features
-", "carbonic_anhydrases.DE.count_table.txt.minRow10.CPM.log2.centered" ) , ColSideColors=sampleAnnotations)
+", "carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered" ) )
 dev.off()
