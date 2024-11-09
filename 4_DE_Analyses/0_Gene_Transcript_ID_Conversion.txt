@@ -1,3 +1,5 @@
+# Data modified from file "Oyster_Final_Gene_Annotations.combined.gtf"
+#gene_id	transcript_id		gene_name	oId	cmp_ref	cmp_ref_gene	consensus_gene_name
 XLOC_000001	TCONS_00001736	-	CUFF.1.1	-	-	-
 XLOC_000001	TCONS_00005893	-	CUFF.3.1	-	-	-
 XLOC_000002	TCONS_00001737	-	CUFF.1.1	-	-	-
