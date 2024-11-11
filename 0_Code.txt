@@ -386,20 +386,24 @@ C_51\tC_51_2" > samples.txt
 
 # Manually created additional file, called "genes.DE.count_table", using "genes.DE.count_table" and "significant" information from "gene_exp.diff" file
 
-/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
+/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/PtR  \
 --matrix genes.DE.count_table.txt \
 --heatmap_colorscheme 'blue,black,yellow' \
 -s samples.txt --min_rowSums 10 --log2 \
 --CPM --center_rows \
---prin_comp 3 --sample_cor_matrix
+--per_gene_plots --per_gene_plots_incl_vioplot \
+--prin_comp 3 --sample_cor_matrix --heatmap 
 
-# Manually created 
+# Manually curated gene names and FPKM matrices for DE genes of interest, see file "0_GOs_of_Interest"
 
-/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/PtR \
---matrix carbonic_anhydrases.DE.count_table.averaged.txt \
---heatmap_colorscheme 'blue,black,yellow' --min_rowSums 10 --log2 \
---CPM --center_rows \
---heatmap
+for i in 1_*.txt; do
+	/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/PtR \
+	--matrix $i --heatmap \
+	--heatmap_colorscheme 'blue,black,yellow' --log2 --center_rows \
+	--specified_column_ordering "C_38_FPKM,C_51_FPKM,E_38_FPKM,E_51_FPKM" --sample_clust none;
+done
+
+
 
 #########
 #########

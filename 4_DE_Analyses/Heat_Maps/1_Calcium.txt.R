@@ -6,20 +6,21 @@ options(stringsAsFactors = FALSE)
 NO_REUSE = F
 
 # try to reuse earlier-loaded data if possible
-if (file.exists("carbonic_anhydrases.DE.count_table.averaged.txt.RData") && ! NO_REUSE) {
+if (file.exists("1_Calcium.txt.RData") && ! NO_REUSE) {
     print('RESTORING DATA FROM EARLIER ANALYSIS')
-    load("carbonic_anhydrases.DE.count_table.averaged.txt.RData")
+    load("1_Calcium.txt.RData")
 } else {
     print('Reading matrix file.')
-    primary_data = read.table("carbonic_anhydrases.DE.count_table.averaged.txt", header=T, com='', row.names=1, check.names=F, sep='\t')
+    primary_data = read.table("1_Calcium.txt", header=T, com='', row.names=1, check.names=F, sep='\t')
     primary_data = as.matrix(primary_data)
 }
-source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/heatmap.3.R")
-source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/misc_rnaseq_funcs.R")
-source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/pairs3.R")
-source("/usr/local/Cellar/trinity/2.11.0/libexec/Analysis/DifferentialExpression/R/vioplot2.R")
+source("/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/R/heatmap.3.R")
+source("/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/R/misc_rnaseq_funcs.R")
+source("/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/R/pairs3.R")
+source("/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/R/vioplot2.R")
 data = primary_data
 myheatcol = colorpanel(75, 'blue','black','yellow')
+data = data[, c('C_38_FPKM','C_51_FPKM','E_38_FPKM','E_51_FPKM'), drop=F ]
 sample_types = colnames(data)
 nsamples = length(sample_types)
 sample_colors = rainbow(nsamples)
@@ -33,10 +34,7 @@ for (i in 1:nsamples) {
     replicates_want = sample_type_list[[sample_type]]
     sample_factoring[ colnames(data) %in% replicates_want ] = sample_type
 }
-data = data[rowSums(data)>=10,]
 initial_matrix = data # store before doing various data transformations
-cs = colSums(data)
-data = t( t(data)/cs) * 1e6;
 data = log2(data+1)
 sample_factoring = colnames(data)
 for (i in 1:nsamples) {
@@ -57,7 +55,7 @@ data = as.matrix(data) # convert to matrix
 # Centering rows
 data = t(scale(t(data), scale=F))
 
-write.table(data, file="carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered.dat", quote=F, sep='	');
+write.table(data, file="1_Calcium.txt.log2.centered.dat", quote=F, sep='	');
 if (nrow(data) < 2) { stop("
 
 **** Sorry, at least two rows are required for this matrix.
@@ -69,13 +67,13 @@ if (ncol(data) < 2) { stop("
 
 ");}
 sample_dist = dist(t(data), method='euclidean')
-hc_samples = hclust(sample_dist, method='complete')
+hc_samples = NULL
 gene_cor = NULL
 gene_dist = dist(data, method='euclidean')
 if (nrow(data) <= 1) { message('Too few genes to generate heatmap'); quit(status=0); }
 hc_genes = hclust(gene_dist, method='complete')
 heatmap_data = data
-pdf("carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered.genes_vs_samples_heatmap.pdf")
-heatmap.3(heatmap_data, dendrogram='both', Rowv=as.dendrogram(hc_genes), Colv=as.dendrogram(hc_samples), col=myheatcol, scale="none", density.info="none", trace="none", key=TRUE, keysize=1.2, cexCol=1, margins=c(10,10), cex.main=0.75, main=paste("samples vs. features
-", "carbonic_anhydrases.DE.count_table.averaged.txt.minRow10.CPM.log2.centered" ) )
+pdf("1_Calcium.txt.log2.centered.genes_vs_samples_heatmap.pdf")
+heatmap.3(heatmap_data, dendrogram='row', Rowv=as.dendrogram(hc_genes), Colv=F, col=myheatcol, scale="none", density.info="none", trace="none", key=TRUE, keysize=1.2, cexCol=0.5, margins=c(10,10), cex.main=0.75, main=paste("samples vs. features
+", "1_Calcium.txt.log2.centered" ) )
 dev.off()

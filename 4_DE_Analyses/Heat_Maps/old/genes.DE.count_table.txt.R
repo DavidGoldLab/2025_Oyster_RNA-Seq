@@ -127,28 +127,3 @@ pdf("genes.DE.count_table.txt.minRow10.CPM.log2.centered.genes_vs_samples_heatma
 heatmap.3(heatmap_data, dendrogram='both', Rowv=as.dendrogram(hc_genes), Colv=as.dendrogram(hc_samples), col=myheatcol, scale="none", density.info="none", trace="none", key=TRUE, keysize=1.2, cexCol=0.5, margins=c(10,10), cex.main=0.75, main=paste("samples vs. features
 ", "genes.DE.count_table.txt.minRow10.CPM.log2.centered" ) , ColSideColors=sampleAnnotations)
 dev.off()
-# per gene plots
-pdf(file="genes.DE.count_table.txt.minRow10.CPM.log2.centered.per_gene_plots.pdf")
-par(mfrow=c(2, 1))
-gene_names = rownames(data)
-# set up barplot colors:
-sample_cols = rainbow(nsamples)
-barplot_cols = c()
-vioplot_colors = list()
-for (i in 1:nsamples) {
-    barplot_cols[ sample_factoring %in% sample_types[i] ] = sample_cols[i]
-    vioplot_colors[[sample_types[i]]] = sample_cols[i]
-}
-for (i in 1:length(data[,1])) {
-    gene_data = data[i,]
-    ymin = min(gene_data); ymax = max(gene_data);
-    barplot(as.numeric(gene_data), cex.names=0.5, names.arg=colnames(data), las=2, main=gene_names[i], col=barplot_cols)
-    df = data.frame(reps = names(gene_data), expr=gene_data)
-    df = data.frame(df, sample_name=samples_data$sample_name[match(df$reps, samples_data$replicate_name)])
-    df2 = df[,c('sample_name', 'expr')]
-     df2$sample_name = factor(df2$sample_name, levels=unique(df2$sample_name))
-    s2 = split(df2, df2$sample_name)
-    vals = lapply(s2, function(x) {x$expr} )
-    vioplot2(vals, names=names(vals), col=unlist(vioplot_colors[names(vals)]))
-}
-dev.off()
