@@ -397,13 +397,8 @@ C_51\tC_51_2" > samples.txt
 # Manually curated gene names and FPKM matrices for DE genes of interest, see file "0_GOs_of_Interest"
 
 for i in 1_*.txt; do
-	/Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/PtR \
-	--matrix $i --heatmap \
-	--heatmap_colorscheme 'blue,black,yellow' --log2 --center_rows \
-	--specified_column_ordering "C_38_FPKM,C_51_FPKM,E_38_FPKM,E_51_FPKM" --sample_clust none;
+    /Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/PtR --matrix $i --heatmap --heatmap_colorscheme 'blue,black,yellow' --log2 --center_rows --Zscale_rows --specified_column_ordering "C_38_FPKM,C_51_FPKM,E_38_FPKM,E_51_FPKM" --sample_clust none;
 done
-
-
 
 #########
 #########
