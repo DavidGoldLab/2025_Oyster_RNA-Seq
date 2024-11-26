@@ -1,13 +1,14 @@
-LOC105320752|XLOC_002437|beta-1,3-galactosyl-O-glycosyl-glycoprotein_beta-1,6-N-acetylglucosaminyltransferase-like	988.75	483.465	1158.74	1108.33	GO:0016020~membrane,_GO:0008375~acetylglucosaminyltransferase_activity,_crg00512:Mucin_type_O-glycan_biosynthesis,crg01100:Metabolic_pathways,
-LOC105326801|XLOC_039145|mucin-19	233.482	90.9726	143.142	146.96	GO:0005615~extracellular_space,GO:0031012~extracellular_matrix,_GO:0005515~protein_binding,_IPR000742:EGF-like_dom,IPR001846:VWF_type-D,_SM00216:VWD,_KW-0245~EGF-like_domain,_KW-1015~Disulfide_bond,
-LOC105327860|XLOC_012807|mucin-2-like	596.277	748.974	143.262	1102.32	GO:0005576~extracellular_region,_GO:0008061~chitin_binding,
-LOC105329356|XLOC_000492|mucin-5AC	0	7.85772	7.415	3.99497	COMPBIAS:Polar_residues,REGION:Disordered,
-LOC105330637|XLOC_033802|mucin-5AC	224.884	94.9353	447.246	133.492	GO:0031991~regulation_of_actomyosin_contractile_ring_contraction,GO:0032955~regulation_of_division_septum_assembly,_GO:0005737~cytoplasm,GO:0016020~membrane,_GO:0005085~guanyl-nucleotide_exchange_factor_activity,_IPR000082:SEA_dom,IPR036364:SEA_dom_sf,_SM00200:SEA,_KW-0472~Membrane,_KW-0812~Transmembrane,KW-1133~Transmembrane_helix,_DOMAIN:SEA,REGION:Disordered,TRANSMEM:Helical,
-LOC105330676|XLOC_035266|glycoprotein-N-acetylgalactosamine_3-beta-galactosyltransferase_1	46898.9	80248.9	123609	64680.3	GO:0006486~protein_glycosylation,GO:0016267~O-glycan_processing,_core_1,_GO:0016020~membrane,_GO:0016263~glycoprotein-N-acetylgalactosamine_3-beta-galactosyltransferase_activity,_IPR003378:Fringe-like_glycosylTrfase,IPR026050:C1GALT1/C1GALT1_chp1,_crg00512:Mucin_type_O-glycan_biosynthesis,crg00514:Other_types_of_O-glycan_biosynthesis,crg01100:Metabolic_pathways,_KW-0472~Membrane,_KW-0735~Signal-anchor,KW-0812~Transmembrane,KW-1133~Transmembrane_helix,_KW-0547~Nucleotide-binding,_KW-0328~Glycosyltransferase,KW-0808~Transferase,_DOMAIN:Fringe-like_glycosyltransferase,TRANSMEM:Helical,
-LOC105331815|XLOC_003544|integumentary_mucin_C.1	1075.84	243.259	1673.38	267.917	GO:0005581~collagen_trimer,GO:0062023~collagen-containing_extracellular_matrix,_IPR002035:VWF_A,IPR003582:ShKT_dom,IPR036465:vWFA_dom_sf,_SM00254:ShKT,SM00327:VWA,_KW-0176~Collagen,KW-0732~Signal,_COMPBIAS:Polar_residues,DOMAIN:ShKT,DOMAIN:VWFA,REGION:Disordered,
-LOC105333069|XLOC_032197|mucin-5AC	32321.2	6326.05	41768.4	15965.2	IPR003582:ShKT_dom,_SM00254:ShKT,_KW-0732~Signal,_KW-1015~Disulfide_bond,_COMPBIAS:Polar_residues,DOMAIN:ShKT,REGION:Disordered,
-LOC105333069|XLOC_032199|mucin-5AC	84.6989	36.0135	129.203	45.5459	IPR003582:ShKT_dom,_SM00254:ShKT,_KW-0732~Signal,_KW-1015~Disulfide_bond,_COMPBIAS:Polar_residues,DOMAIN:ShKT,REGION:Disordered,
-LOC105333069|XLOC_032201|mucin-5AC	64.8287	15.5175	182.621	34.7311	IPR003582:ShKT_dom,_SM00254:ShKT,_KW-0732~Signal,_KW-1015~Disulfide_bond,_COMPBIAS:Polar_residues,DOMAIN:ShKT,REGION:Disordered,
-LOC105345014|XLOC_007869|mucin-22	11.7241	4.22087	53.0409	0	GO:0016020~membrane,_IPR007110:Ig-like_dom,IPR013162:CD80_C2-set,IPR013783:Ig-like_fold,IPR036179:Ig-like_dom_sf,_KW-0472~Membrane,_KW-0732~Signal,KW-0812~Transmembrane,KW-1133~Transmembrane_helix,_COMPBIAS:Basic_and_acidic_residues,COMPBIAS:Polar_residues,DOMAIN:Ig-like,REGION:Disordered,TRANSMEM:Helical,
-LOC117688920|XLOC_023507|mucin-5AC-like	2586.37	585.311	2907.29	486.541	KW-0732~Signal,_COMPBIAS:Polar_residues,REGION:Disordered,
-LOC117688920|XLOC_023508|mucin-5AC-like	141.574	103.459	172.888	70.5136	KW-0732~Signal,_COMPBIAS:Polar_residues,REGION:Disordered,
+ID	E_38_FPKM	E_51_FPKM	C_38_FPKM	C_51_FPKM
+LOC105320752|XLOC_002437|beta-1,3-galactosyl-O-glycosyl-glycoprotein_beta-1,6-N-acetylglucosaminyltransferase-like	988.75	483.465	1158.74	1108.33
+LOC105326801|XLOC_039145|mucin-19	233.482	90.9726	143.142	146.96
+LOC105327860|XLOC_012807|mucin-2-like	596.277	748.974	143.262	1102.32
+LOC105329356|XLOC_000492|mucin-5AC	0	7.85772	7.415	3.99497
+LOC105330637|XLOC_033802|mucin-5AC	224.884	94.9353	447.246	133.492
+LOC105330676|XLOC_035266|glycoprotein-N-acetylgalactosamine_3-beta-galactosyltransferase_1	46898.9	80248.9	123609	64680.3
+LOC105331815|XLOC_003544|integumentary_mucin_C.1	1075.84	243.259	1673.38	267.917
+LOC105333069|XLOC_032197|mucin-5AC	32321.2	6326.05	41768.4	15965.2
+LOC105333069|XLOC_032199|mucin-5AC	84.6989	36.0135	129.203	45.5459
+LOC105333069|XLOC_032201|mucin-5AC	64.8287	15.5175	182.621	34.7311
+LOC105345014|XLOC_007869|mucin-22	11.7241	4.22087	53.0409	0
+LOC117688920|XLOC_023507|mucin-5AC-like	2586.37	585.311	2907.29	486.541
+LOC117688920|XLOC_023508|mucin-5AC-like	141.574	103.459	172.888	70.5136

@@ -1,3 +1,4 @@
+ID	E_38_FPKM	E_51_FPKM	C_38_FPKM	C_51_FPKM
 LOC105329587|XLOC_032600|serine/threonine-protein_kinase_PAK_3	52.6963	35.5482	64.7147	86.8024
 LOC105338795|XLOC_030644|stress-activated_protein_kinase_JNK	0	360.666	0	37.9422
 LOC105339236|XLOC_004626|dual_specificity_mitogen-activated_protein_kinase_kinase_7	991.927	1566.37	1675.12	588.34
