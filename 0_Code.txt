@@ -14,6 +14,7 @@ cd /0_Data
 
 # Download NCBI Datasets and make it executable
 curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets'
+# for Mac: curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/mac/datasets'
 chmod +x datasets
 
 # download genome
@@ -394,7 +395,7 @@ C_51\tC_51_2" > samples.txt
 --per_gene_plots --per_gene_plots_incl_vioplot \
 --prin_comp 3 --sample_cor_matrix --heatmap 
 
-# Manually curated gene names and FPKM matrices for DE genes of interest, see file "0_GOs_of_Interest"
+# Manually curated gene names and FPKM matrices for DE genes of interest, see file "0_Heat_Map_Dataset.txt"
 
 for i in 1_*.txt; do
     /Applications/trinityrnaseq-v2.15.2/Analysis/DifferentialExpression/PtR --matrix $i --heatmap --heatmap_colorscheme 'blue,black,yellow' --log2 --center_rows --Zscale_rows --specified_column_ordering "C_38_FPKM,C_51_FPKM,E_38_FPKM,E_51_FPKM" --sample_clust none;
