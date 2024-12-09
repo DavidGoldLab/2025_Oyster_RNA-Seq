@@ -1,4 +1,4 @@
-# Modified from files "2_Cufflinks/cuffdiff/genes.fpkm_tracking", "1-All_DE_Genes_Annotated.txt", and "0-DAVID_Functional_Annotation_Table.txt"
+# Modified from files "2_Cufflinks/cuffdiff/genes.fpkm_tracking", "2_Cufflinks/cuffdiff/gene_exp.diff" "1-All_DE_Genes_Annotated.txt", and "0-DAVID_Functional_Annotation_Table.txt"
 #
 #DAVID_Gene|gene_id|Gene_Name	E_38_FPKM	E_51_FPKM	C_38_FPKM	C_51_FPKM	
 -|XLOC_000029|#N/A	877.265	1901.53	1644.58	2458.91	#N/A

@@ -1,0 +1,11 @@
+ID	E_38_FPKM	E_51_FPKM	C_38_FPKM	C_51_FPKM
+LOC105323165|XLOC_000751|adenomatous_polyposis_coli_protein	108.075	158.079	107.578	88.923
+LOC105329031|XLOC_006924|low-density_lipoprotein_receptor-related_protein_4	4635.16	1287.96	4339.64	3227.19
+LOC105328278|XLOC_007449|CREB-binding_protein	412.805	742.434	548.84	320.784
+LOC105348704|XLOC_019611|low-density_lipoprotein_receptor-related_protein_6-like	413.015	496.828	362.984	153.096
+LOC105349010|XLOC_019617|secreted_frizzled-related_protein_5	453.936	353.14	529.755	887.429
+LOC105321031|XLOC_027672|ras-related_C3_botulinum_toxin_substrate_1	89.9503	153.034	89.4234	45.4051
+LOC105341654|XLOC_028053|transcription_factor_AP-1	5045.7	4497.48	12780.1	6909.8
+LOC105322578|XLOC_034768|protein_Wnt-11b-2	59.7355	0	0	15.7926
+LOC105322000|XLOC_036935|palmitoleoyl-protein_carboxylesterase_notum1	837.937	948.932	690.707	452.986
+LOC105343871|XLOC_039190|BMP_and_activin_membrane-bound_inhibitor_homolog	188.181	160.303	200.774	303.399
